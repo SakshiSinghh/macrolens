@@ -73,7 +73,13 @@ export function Sidebar() {
         <div className="text-[10px] text-[#4A5A6E] font-mono">
           <div className="flex items-center justify-between">
             <span>DATA</span>
-            <span className="text-[#22C55E]">● LIVE</span>
+            <span className="flex items-center gap-1.5">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22C55E] opacity-60" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#22C55E]" />
+              </span>
+              <span className="text-[#22C55E]">LIVE</span>
+            </span>
           </div>
           <div className="text-[#4A5A6E] mt-0.5">Updated 2 min ago</div>
         </div>
