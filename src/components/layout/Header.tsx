@@ -1,4 +1,5 @@
 'use client'
+import { useState, useEffect } from 'react'
 import { Bell, RefreshCw, Clock } from 'lucide-react'
 
 interface HeaderProps {
@@ -7,11 +8,17 @@ interface HeaderProps {
 }
 
 export function Header({ title, subtitle }: HeaderProps) {
-  const now = new Date()
-  const timeStr = now.toLocaleString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-    hour: '2-digit', minute: '2-digit', timeZoneName: 'short'
-  })
+  const [timeStr, setTimeStr] = useState('')
+
+  useEffect(() => {
+    const update = () => setTimeStr(new Date().toLocaleString('en-US', {
+      month: 'short', day: 'numeric', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', timeZoneName: 'short'
+    }))
+    update()
+    const id = setInterval(update, 60_000)
+    return () => clearInterval(id)
+  }, [])
 
   return (
     <header className="h-14 bg-[#080C14] border-b border-[#1E2A3B] flex items-center justify-between px-6 sticky top-0 z-30">
