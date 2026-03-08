@@ -4,14 +4,28 @@ import { NextResponse } from 'next/server'
 import { mockThemes } from '@/lib/mock/themes'
 import { rankThemesByMomentum } from '@/lib/theme-engine'
 import { computeThemeMomentum } from '@/lib/scoring'
+import { fetchMacroNews } from '@/lib/newsapi'
+import type { MacroThemeKey } from '@/types'
 
 // GET /api/themes
-// Returns scored + ranked themes with fresh momentum scores
+// Phase 3: fetches real news from NewsAPI and boosts/adjusts theme momentum
+// based on live article counts. Falls back to scored mock themes if NewsAPI unavailable.
 export async function GET() {
   try {
+    // Fetch news — returns mock sources if NEWS_API_KEY not configured
+    const { articles, source: newsSource } = await fetchMacroNews(60)
+
     const now = new Date()
 
-    // Re-score all themes with fresh computeThemeMomentum values
+    // Count live articles per theme from real (or mock) news
+    const liveArticleCounts: Partial<Record<MacroThemeKey, number>> = {}
+    for (const article of articles) {
+      for (const theme of article.themes) {
+        liveArticleCounts[theme] = (liveArticleCounts[theme] ?? 0) + 1
+      }
+    }
+
+    // Re-score all themes, blending mock baseline with live article signal
     const scoredThemes = mockThemes.map((theme) => {
       const firstDetected = new Date(theme.firstDetectedAt)
       const daysSinceFirstDetected = Math.max(
@@ -19,15 +33,31 @@ export async function GET() {
         (now.getTime() - firstDetected.getTime()) / (1000 * 60 * 60 * 24)
       )
 
+      // If we have live article counts, blend them in as a velocity boost
+      const liveCount = liveArticleCounts[theme.key] ?? 0
+      const blendedArticleCount =
+        newsSource === 'live'
+          ? Math.max(theme.articleCount, theme.articleCount + liveCount)
+          : theme.articleCount
+
+      const blendedHighImpact =
+        newsSource === 'live'
+          ? Math.max(theme.highImpactArticleCount, Math.round(liveCount * 0.3))
+          : theme.highImpactArticleCount
+
+      // Velocity adjustment: live count > 5 articles → small velocity boost
+      const velocityBoost = newsSource === 'live' && liveCount > 5 ? liveCount * 0.1 : 0
+      const blendedVelocity = Math.min(10, theme.velocity + velocityBoost)
+
       const avgSeverity =
-        theme.articleCount > 0
-          ? Math.min(100, (theme.highImpactArticleCount / theme.articleCount) * 100)
+        blendedArticleCount > 0
+          ? Math.min(100, (blendedHighImpact / blendedArticleCount) * 100)
           : 50
 
       const freshMomentum = computeThemeMomentum({
-        articleCount: theme.articleCount,
-        highImpactCount: theme.highImpactArticleCount,
-        velocityPerDay: theme.velocity,
+        articleCount: blendedArticleCount,
+        highImpactCount: blendedHighImpact,
+        velocityPerDay: blendedVelocity,
         daysSinceFirstDetected,
         avgSeverity,
       })
@@ -35,6 +65,7 @@ export async function GET() {
       return {
         ...theme,
         momentumScore: freshMomentum,
+        articleCount: blendedArticleCount,
       }
     })
 
@@ -44,7 +75,8 @@ export async function GET() {
     return NextResponse.json({
       themes: rankedThemes,
       generatedAt: new Date().toISOString(),
-      source: 'computed' as const,
+      newsSource,
+      liveArticleCounts,
     })
   } catch (error) {
     console.error('[api/themes] Error ranking themes:', error)
@@ -53,7 +85,7 @@ export async function GET() {
     return NextResponse.json({
       themes: sorted,
       generatedAt: new Date().toISOString(),
-      source: 'mock' as const,
+      newsSource: 'mock',
     })
   }
 }
