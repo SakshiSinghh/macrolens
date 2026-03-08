@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MacroLens — AI-Powered Macro Intelligence Platform
 
-## Getting Started
+> **Live Demo:** https://macrolens-k2pr29hqz-sakshis-projects-38aa5c82.vercel.app/
 
-First, run the development server:
+MacroLens converts macroeconomic news, economic indicators, and market signals into actionable risk alerts, theme tracking, and domino effect visualizations — purpose-built for asset managers and macro analysts.
+
+---
+
+## Features
+
+| Page | Description |
+|---|---|
+| **Dashboard** | Real-time alerts, top themes, market snapshot, news feed with signal scores |
+| **Theme Radar** | Detected macro themes with momentum, lifecycle timeline, and source articles |
+| **Global Heat Map** | Interactive world map — country risk by theme, cross-asset spillover matrix |
+| **Domino Graph** | Event cascade visualization — how one shock propagates across assets and countries |
+| **AI Insights** | Chat interface grounded in platform data, not generic LLM answers |
+| **Institutional Memory** | Historical episode comparison — what happened in similar past situations |
+| **Morning Briefing** | Analyst-ready daily narrative, one-click copy/export |
+| **Watchlist** | Pinned themes/countries with custom alert thresholds and analyst notes |
+
+---
+
+## Quick Start
 
 ```bash
+# 1. Install dependencies
+npm install --legacy-peer-deps
+
+# 2. Copy env file
+cp .env.example .env.local
+
+# 3. Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Environment Variables
 
-## Learn More
+See `.env.example` for all variables. For Phase 1 (mock data only), no API keys are needed.
 
-To learn more about Next.js, take a look at the following resources:
+| Variable | Purpose | Required |
+|---|---|---|
+| `NEXT_PUBLIC_DEMO_MODE` | Lock to mock data (safe for demos) | Phase 1 |
+| `OPENAI_API_KEY` | AI Insights + Morning Briefing | Phase 2 |
+| `NEWS_API_KEY` | Live news ingestion | Phase 3 |
+| `FRED_API_KEY` | Macro indicators (CPI, yields, etc.) | Phase 3 |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Tech Stack
 
-## Deploy on Vercel
+- **Framework:** Next.js 16 (App Router) + TypeScript
+- **Styling:** Tailwind CSS + Inter / JetBrains Mono fonts
+- **Charts:** Recharts (sparklines, momentum charts)
+- **World Map:** react-simple-maps
+- **Graph:** React Flow (@xyflow/react)
+- **Icons:** Lucide React
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Architecture
+
+```
+src/
+├── app/              # Next.js App Router pages + API routes
+├── components/       # Reusable UI components
+│   ├── layout/       # Sidebar, Header, RegimeBanner, AppShell
+│   ├── dashboard/    # Dashboard-specific components
+│   ├── heatmap/      # WorldMap, SpilloverMatrix
+│   ├── domino/       # DominoGraph (React Flow)
+│   └── ui/           # Badge, Card, Sparkline, RiskMeter, SignalScore
+├── lib/
+│   ├── mock/         # Realistic mock data (Phase 1 fallback)
+│   └── utils.ts      # Shared utilities
+└── types/            # All TypeScript interfaces
+```
+
+---
+
+## Phases
+
+| Phase | Status | Description |
+|---|---|---|
+| Phase 1 | ✅ Complete | Full UI with mock data, deployed to Vercel |
+| Phase 2 | Planned | Backend routes, scoring logic, alert generation |
+| Phase 3 | Planned | FRED + NewsAPI integrations |
+| Phase 4 | Planned | Polish, animations, demo hardening |
