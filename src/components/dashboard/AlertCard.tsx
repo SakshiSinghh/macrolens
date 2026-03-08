@@ -9,10 +9,19 @@ interface AlertCardProps {
   alert: RiskAlert
 }
 
+const severityLeftBorder: Record<string, string> = {
+  critical: 'border-l-[#9B1C1C]',
+  high:     'border-l-[#EF4444]',
+  elevated: 'border-l-[#F97316]',
+  moderate: 'border-l-[#EAB308]',
+  low:      'border-l-[#22C55E]',
+}
+
 export function AlertCard({ alert }: AlertCardProps) {
+  const leftBorder = severityLeftBorder[alert.severity] ?? 'border-l-[#1E2A3B]'
   return (
     <Link href="/insights">
-      <div className="bg-[#0F1623] border border-[#1E2A3B] rounded-md p-4 hover:border-[#2D7DD2]/40 hover:bg-[#111927] transition-colors cursor-pointer group">
+      <div className={`bg-[#0F1623] border border-[#1E2A3B] border-l-2 ${leftBorder} rounded-md p-4 hover:border-[#2D7DD2]/40 hover:bg-[#111927] transition-colors cursor-pointer group`}>
         {/* Header */}
         <div className="flex items-start justify-between gap-2 mb-2">
           <div className="flex items-center gap-2">
