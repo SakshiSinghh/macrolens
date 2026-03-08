@@ -2,22 +2,31 @@ export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
 import { classifyRegime } from '@/lib/scoring'
+import { fetchMacroIndicators, buildRegimeDrivers } from '@/lib/fred'
 import { mockRegime } from '@/lib/mock/regime'
 
-// Current indicator values matching the mock data narrative
-const CURRENT_INDICATORS = {
-  cpiYoY: 3.2,
-  fedFundsRate: 5.5,
-  yieldTenYear: 4.82,
-  unemploymentRate: 4.1,
-  gdpGrowthQoQ: 0.8,
-}
-
 // GET /api/regime
-// Returns the current macro regime, computed from indicators (FRED data in Phase 3)
+// Returns the current macro regime.
+// Phase 3: uses live FRED indicators when FRED_API_KEY is configured.
+// Falls back to mock data gracefully if the API is unavailable.
 export async function GET() {
   try {
-    const computed = classifyRegime(CURRENT_INDICATORS)
+    // Fetch indicators — returns mock data if FRED_API_KEY not set
+    const indicators = await fetchMacroIndicators()
+
+    const computed = classifyRegime({
+      cpiYoY: indicators.cpiYoY,
+      fedFundsRate: indicators.fedFundsRate,
+      yieldTenYear: indicators.yieldTenYear,
+      unemploymentRate: indicators.unemploymentRate,
+      gdpGrowthQoQ: indicators.gdpGrowthQoQ,
+    })
+
+    // Use live driver strings when data is live; keep mock drivers otherwise
+    const drivers =
+      indicators.source === 'live'
+        ? buildRegimeDrivers(indicators)
+        : mockRegime.drivers
 
     const response = {
       current: computed.regime,
@@ -25,25 +34,26 @@ export async function GET() {
       confidence: computed.confidence,
       shiftingToward: computed.shiftingToward,
       shiftingLabel: computed.shiftingLabel,
-      drivers: mockRegime.drivers,
+      drivers,
       lastUpdated: new Date().toISOString(),
       indicators: {
-        cpiYoY: CURRENT_INDICATORS.cpiYoY,
-        fedFundsRate: CURRENT_INDICATORS.fedFundsRate,
-        yieldTenYear: CURRENT_INDICATORS.yieldTenYear,
-        unemploymentRate: CURRENT_INDICATORS.unemploymentRate,
-        gdpGrowthQoQ: CURRENT_INDICATORS.gdpGrowthQoQ,
+        cpiYoY: indicators.cpiYoY,
+        fedFundsRate: indicators.fedFundsRate,
+        yieldTenYear: indicators.yieldTenYear,
+        unemploymentRate: indicators.unemploymentRate,
+        gdpGrowthQoQ: indicators.gdpGrowthQoQ,
       },
+      dataSource: indicators.source,
       generatedAt: new Date().toISOString(),
     }
 
     return NextResponse.json(response)
   } catch (error) {
-    console.error('[api/regime] Error computing regime:', error)
-    // Fallback to mock data
+    console.error('[api/regime] Unexpected error:', error)
+    // Last-resort fallback to fully static mock
     return NextResponse.json({
       ...mockRegime,
-      indicators: CURRENT_INDICATORS,
+      dataSource: 'mock',
       generatedAt: new Date().toISOString(),
     })
   }

@@ -25,6 +25,13 @@ const navItems = [
   { href: '/watchlist', label: 'Watchlist', icon: Bookmark },
 ]
 
+// NEXT_PUBLIC_DATA_SOURCE controls the footer badge:
+//   "LIVE"  → real FRED + NewsAPI keys configured
+//   "DEMO"  → running on rich mock data (safe for demos, no key needed)
+// Defaults to DEMO if env var is not set.
+const DATA_SOURCE = process.env.NEXT_PUBLIC_DATA_SOURCE ?? 'DEMO'
+const isLive = DATA_SOURCE === 'LIVE'
+
 export function Sidebar() {
   const pathname = usePathname()
 
@@ -68,20 +75,31 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Footer */}
+      {/* Footer — data source indicator */}
       <div className="px-4 py-3 border-t border-[#1E2A3B]">
         <div className="text-[10px] text-[#4A5A6E] font-mono">
           <div className="flex items-center justify-between">
             <span>DATA</span>
-            <span className="flex items-center gap-1.5">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22C55E] opacity-60" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#22C55E]" />
+            {isLive ? (
+              /* LIVE — animated green ping */
+              <span className="flex items-center gap-1.5">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22C55E] opacity-60" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#22C55E]" />
+                </span>
+                <span className="text-[#22C55E]">LIVE</span>
               </span>
-              <span className="text-[#22C55E]">LIVE</span>
-            </span>
+            ) : (
+              /* DEMO — static amber dot */
+              <span className="flex items-center gap-1.5">
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#F5A623]" />
+                <span className="text-[#F5A623]">DEMO</span>
+              </span>
+            )}
           </div>
-          <div className="text-[#4A5A6E] mt-0.5">Updated 2 min ago</div>
+          <div className="text-[#4A5A6E] mt-0.5">
+            {isLive ? 'FRED · NewsAPI' : 'Rich mock data'}
+          </div>
         </div>
       </div>
     </aside>

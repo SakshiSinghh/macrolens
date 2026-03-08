@@ -5,11 +5,16 @@ import { mockAlerts } from '@/lib/mock/alerts'
 import { mockThemes } from '@/lib/mock/themes'
 import { mockHeatmap } from '@/lib/mock/heatmap'
 import { generateAlerts, rankAlerts } from '@/lib/alert-engine'
+import { fetchMacroIndicators } from '@/lib/fred'
 
 // GET /api/alerts
-// Generates and returns ranked alerts using the alert engine, falls back to mockAlerts
+// Phase 3: uses live FRED indicators for the scoring pipeline when available.
+// Falls back to hardcoded indicators + mock alerts if FRED is unavailable.
 export async function GET() {
   try {
+    // Fetch indicators — returns mock if FRED_API_KEY not set
+    const indicators = await fetchMacroIndicators()
+
     // Build country scores map from heatmap data
     const countryScores: Record<string, number> = {}
     for (const country of mockHeatmap) {
@@ -23,40 +28,41 @@ export async function GET() {
       affectedCountries: theme.affectedCountries,
     }))
 
-    // Current macro indicators
-    const indicators: Record<string, number> = {
-      cpiYoY: 3.2,
-      fedFundsRate: 5.5,
-      yieldTenYear: 4.82,
-      unemploymentRate: 4.1,
-      gdpGrowthQoQ: 0.8,
+    // Pass live (or fallback) indicators to the scoring engine
+    const indicatorMap: Record<string, number> = {
+      cpiYoY: indicators.cpiYoY,
+      fedFundsRate: indicators.fedFundsRate,
+      yieldTenYear: indicators.yieldTenYear,
+      unemploymentRate: indicators.unemploymentRate,
+      gdpGrowthQoQ: indicators.gdpGrowthQoQ,
     }
 
     // Generate and rank alerts
     const generatedAlerts = generateAlerts({
       themes: themeInputs,
       countryScores,
-      indicators,
+      indicators: indicatorMap,
     })
 
     const rankedGenerated = rankAlerts(generatedAlerts)
 
-    // If generation produced results, use them; otherwise fall back to mock
+    // Prefer generated alerts; fall back to mock if generation is empty
     const alerts = rankedGenerated.length > 0 ? rankedGenerated : rankAlerts(mockAlerts)
 
     return NextResponse.json({
       alerts,
       generatedAt: new Date().toISOString(),
       totalCount: alerts.length,
+      indicatorSource: indicators.source,
     })
   } catch (error) {
     console.error('[api/alerts] Error generating alerts:', error)
-    // Fallback to ranked mock alerts
     const ranked = rankAlerts(mockAlerts)
     return NextResponse.json({
       alerts: ranked,
       generatedAt: new Date().toISOString(),
       totalCount: ranked.length,
+      indicatorSource: 'mock',
     })
   }
 }
