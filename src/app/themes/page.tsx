@@ -11,19 +11,35 @@ import { MacroTheme } from '@/types'
 
 export default function ThemesPage() {
   const [selected, setSelected] = useState<MacroTheme>(mockThemes[0])
+  const [detailOpen, setDetailOpen] = useState(false)
+
+  const handleSelect = (theme: MacroTheme) => {
+    setSelected(theme)
+    setDetailOpen(true)
+  }
 
   return (
     <AppShell title="Theme Radar" subtitle="Detected macro themes and momentum tracking">
-      <div className="grid grid-cols-12 gap-4">
-        {/* Theme list */}
-        <div className="col-span-4 space-y-2">
+      {/* Mobile: back button when detail is open */}
+      {detailOpen && (
+        <button
+          onClick={() => setDetailOpen(false)}
+          className="md:hidden mb-3 text-xs text-[#2D7DD2] flex items-center gap-1"
+        >
+          ← Back to theme list
+        </button>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* Theme list — hidden on mobile when detail is open */}
+        <div className={`lg:col-span-4 space-y-2 ${detailOpen ? 'hidden lg:block' : 'block'}`}>
           {mockThemes.map(theme => {
             const trendColor = getTrendColor(theme.trendDirection)
             const isSelected = theme.id === selected.id
             return (
               <div
                 key={theme.id}
-                onClick={() => setSelected(theme)}
+                onClick={() => handleSelect(theme)}
                 className={`bg-[#0F1623] border rounded-md p-4 cursor-pointer transition-colors ${
                   isSelected
                     ? 'border-[#00C2FF]/50 bg-[#0F1E2E]'
@@ -31,14 +47,14 @@ export default function ThemesPage() {
                 }`}
               >
                 <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className="text-sm font-semibold text-[#E8EDF5]">{theme.name}</span>
                       {theme.badge && <TrendBadge badge={theme.badge} />}
                     </div>
                     <div className="text-xs text-[#4A5A6E]">First detected {timeAgo(theme.firstDetectedAt)}</div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right shrink-0 ml-2">
                     <div className="text-xl font-bold font-mono" style={{ color: trendColor }}>{theme.momentumScore}</div>
                     <div className="text-xs font-mono" style={{ color: trendColor }}>{getTrendIcon(theme.trendDirection)}</div>
                   </div>
@@ -58,38 +74,37 @@ export default function ThemesPage() {
           })}
         </div>
 
-        {/* Theme detail */}
-        <div className="col-span-8 space-y-4">
+        {/* Theme detail — full width on mobile when selected, right pane on desktop */}
+        <div className={`lg:col-span-8 space-y-4 ${!detailOpen ? 'hidden lg:block' : 'block'}`}>
           {/* Header */}
-          <div className="bg-[#0F1623] border border-[#1E2A3B] rounded-md p-5">
-            <div className="flex items-start justify-between mb-3">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <h2 className="text-lg font-bold text-[#E8EDF5]">{selected.name}</h2>
+          <div className="bg-[#0F1623] border border-[#1E2A3B] rounded-md p-4 md:p-5">
+            <div className="flex items-start justify-between mb-3 gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                  <h2 className="text-base md:text-lg font-bold text-[#E8EDF5]">{selected.name}</h2>
                   {selected.badge && <TrendBadge badge={selected.badge} />}
                 </div>
-                <p className="text-sm text-[#7A8FA6]">{selected.description}</p>
+                <p className="text-xs md:text-sm text-[#7A8FA6]">{selected.description}</p>
               </div>
               <div className="text-right shrink-0">
-                <div className="text-3xl font-bold font-mono" style={{ color: getTrendColor(selected.trendDirection) }}>
+                <div className="text-2xl md:text-3xl font-bold font-mono" style={{ color: getTrendColor(selected.trendDirection) }}>
                   {selected.momentumScore}
                 </div>
-                <div className="text-xs text-[#7A8FA6]">momentum score</div>
+                <div className="text-xs text-[#7A8FA6]">momentum</div>
               </div>
             </div>
 
-            {/* 30-day lifecycle chart */}
-            <div className="h-20 mt-4">
+            <div className="h-16 md:h-20 mt-3 md:mt-4">
               <div className="text-xs text-[#4A5A6E] mb-1">30-day momentum</div>
-              <Sparkline data={selected.lifecycleData} color={getTrendColor(selected.trendDirection)} height={64} />
+              <Sparkline data={selected.lifecycleData} color={getTrendColor(selected.trendDirection)} height={52} />
             </div>
 
-            {/* Stats row */}
-            <div className="grid grid-cols-4 gap-3 mt-4 pt-4 border-t border-[#1E2A3B]">
-              <Stat label="Articles" value={selected.articleCount.toString()} />
+            {/* Stats row: 2 cols mobile, 4 cols desktop */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3 md:mt-4 pt-3 md:pt-4 border-t border-[#1E2A3B]">
+              <Stat label="Articles"    value={selected.articleCount.toString()} />
               <Stat label="High Impact" value={selected.highImpactArticleCount.toString()} />
-              <Stat label="Velocity" value={`+${selected.velocity}/day`} />
-              <Stat label="Countries" value={selected.affectedCountries.length.toString()} />
+              <Stat label="Velocity"    value={`+${selected.velocity}/day`} />
+              <Stat label="Countries"   value={selected.affectedCountries.length.toString()} />
             </div>
           </div>
 
@@ -123,7 +138,7 @@ export default function ThemesPage() {
               {selected.sourceArticles.map(article => (
                 <div key={article.id} className="px-4 py-3 flex items-start gap-3">
                   <SignalScore score={article.marketMovingScore} />
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm text-[#E8EDF5] leading-snug">{article.headline}</p>
                     <div className="text-xs text-[#4A5A6E] mt-0.5">
                       <span className="text-[#7A8FA6]">{article.source}</span>

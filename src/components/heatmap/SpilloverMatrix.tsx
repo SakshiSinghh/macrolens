@@ -53,6 +53,7 @@ export function SpilloverMatrix({ activeTheme }: SpilloverMatrixProps) {
         <span className="text-xs text-[#4A5A6E]">Theme: <span className="text-[#E8EDF5] capitalize">{activeTheme.replace('-', ' ')}</span></span>
       </div>
       <div className="overflow-x-auto">
+        <p className="text-[10px] text-[#4A5A6E] px-4 pt-2 sm:hidden">← Scroll to see all columns</p>
         <table className="w-full text-xs">
           <thead>
             <tr className="border-b border-[#1E2A3B]">

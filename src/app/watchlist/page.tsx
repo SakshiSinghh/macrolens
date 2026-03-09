@@ -113,10 +113,10 @@ export default function WatchlistPage() {
 
   return (
     <AppShell title="Watchlist" subtitle="Pinned themes, countries, and alerts with custom thresholds">
-      <div className="grid grid-cols-12 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
         {/* ── Left: watch items ── */}
-        <div className="col-span-8 space-y-3">
+        <div className="lg:col-span-8 space-y-3">
           <div className="flex items-center justify-between mb-2">
             <div className="text-xs text-[#4A5A6E] uppercase tracking-wider">{items.length} items tracked</div>
             <button
@@ -132,7 +132,7 @@ export default function WatchlistPage() {
           {showAddForm && (
             <div className="bg-[#0F1623] border border-[#00C2FF]/30 rounded-md p-4 space-y-3 animate-scale-in">
               <div className="text-xs font-semibold text-[#00C2FF] uppercase tracking-wider">New Watchlist Item</div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="col-span-2">
                   <label className="text-[10px] text-[#4A5A6E] uppercase tracking-wider mb-1 block">Label / Name *</label>
                   <input
@@ -271,7 +271,7 @@ export default function WatchlistPage() {
         </div>
 
         {/* ── Right: quick add panels ── */}
-        <div className="col-span-4 space-y-4">
+        <div className="lg:col-span-4 space-y-4">
 
           {/* Themes */}
           <div className="bg-[#0F1623] border border-[#1E2A3B] rounded-md">
