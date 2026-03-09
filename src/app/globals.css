@@ -145,6 +145,8 @@ html[data-theme="light"] .divide-\[\#1E2A3B\] > :not([hidden]) ~ :not([hidden]) 
 html[data-theme="light"] .text-\[\#E8EDF5\] { color: #0F1623 !important; }
 html[data-theme="light"] .text-\[\#7A8FA6\] { color: #3D5166 !important; }
 html[data-theme="light"] .text-\[\#4A5A6E\] { color: #6B7E8F !important; }
+/* AI chat response text — light blue-gray is unreadable on the lightened bubble */
+html[data-theme="light"] .text-\[\#C8D5E5\] { color: #1E2D3D !important; }
 
 /* ── Charts & graphs ──────────────────────────────────────────────────────── */
 html[data-theme="light"] .recharts-cartesian-grid-horizontal line,

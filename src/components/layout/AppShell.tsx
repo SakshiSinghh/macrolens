@@ -3,6 +3,7 @@ import { ReactNode, useState } from 'react'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { RegimeBanner } from './RegimeBanner'
+import { WorkflowBar } from './WorkflowBar'
 import { mockRegime } from '@/lib/mock/regime'
 
 interface AppShellProps {
@@ -40,6 +41,7 @@ export function AppShell({ children, title, subtitle }: AppShellProps) {
           onMenuClick={() => setMobileSidebarOpen(true)}
         />
         <main className="flex-1 p-4 md:p-6 animate-fade-in">
+          <WorkflowBar />
           {children}
         </main>
       </div>
