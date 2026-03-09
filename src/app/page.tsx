@@ -1,4 +1,3 @@
-import { Fragment } from 'react'
 import { AppShell } from '@/components/layout/AppShell'
 import { AlertCard } from '@/components/dashboard/AlertCard'
 import { ThemeCard } from '@/components/dashboard/ThemeCard'
@@ -11,16 +10,6 @@ import { mockMarketSignals } from '@/lib/mock/market'
 import { mockSources } from '@/lib/mock/sources'
 import { mockRegime } from '@/lib/mock/regime'
 import Link from 'next/link'
-import { ChevronRight, TrendingUp, Globe, Clock, Zap } from 'lucide-react'
-
-// ─── Workflow bar ──────────────────────────────────────────────────────────────
-// Guides judges / new users through: DETECT → UNDERSTAND IMPACT → COMPARE → ACT
-const WORKFLOW_STEPS = [
-  { num: 1, label: 'DETECT',            desc: 'Dashboard · Themes',    href: '/',        active: true,  icon: TrendingUp },
-  { num: 2, label: 'UNDERSTAND IMPACT', desc: 'Heat Map · Domino',     href: '/heatmap', active: false, icon: Globe      },
-  { num: 3, label: 'COMPARE HISTORY',   desc: 'Memory · AI Insights',  href: '/memory',  active: false, icon: Clock      },
-  { num: 4, label: 'ACT',               desc: 'Briefing · Watchlist',  href: '/briefing',active: false, icon: Zap        },
-]
 
 // ─── Regime colour palette (warm/cool tones for light mode) ───────────────────
 const REGIME_COLORS: Record<string, { bg: string; border: string; accent: string; text: string }> = {
@@ -41,42 +30,7 @@ export default function DashboardPage() {
   return (
     <AppShell title="Dashboard" subtitle="Global Macro Intelligence Overview">
 
-      {/* ── 1. Workflow bar ──────────────────────────────────────────────── */}
-      <div className="bg-white border border-slate-200 rounded-xl p-2 mb-5 flex items-center shadow-sm">
-        {WORKFLOW_STEPS.map((step, i) => (
-          <Fragment key={step.num}>
-            <Link
-              href={step.href}
-              className={`flex-1 flex items-center gap-2.5 px-3 py-2.5 rounded-lg transition-all min-w-0 ${
-                step.active ? 'bg-[#1E3A5F]' : 'hover:bg-slate-50'
-              }`}
-            >
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                step.active ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-500'
-              }`}>
-                {step.num}
-              </div>
-              <div className="min-w-0">
-                <div className={`text-xs font-bold tracking-wide truncate ${
-                  step.active ? 'text-white' : 'text-slate-600'
-                }`}>
-                  {step.label}
-                </div>
-                <div className={`text-[10px] truncate mt-0.5 ${
-                  step.active ? 'text-white/65' : 'text-slate-400'
-                }`}>
-                  {step.desc}
-                </div>
-              </div>
-            </Link>
-            {i < WORKFLOW_STEPS.length - 1 && (
-              <ChevronRight className="w-4 h-4 text-slate-300 shrink-0 mx-1" />
-            )}
-          </Fragment>
-        ))}
-      </div>
-
-      {/* ── 2. Regime hero ────────────────────────────────────────────────── */}
+      {/* ── 1. Regime hero ────────────────────────────────────────────────── */}
       <div
         className="rounded-xl p-5 mb-5 border"
         style={{ backgroundColor: rColor.bg, borderColor: rColor.border }}
@@ -120,7 +74,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ── 3. Stat row ───────────────────────────────────────────────────── */}
+      {/* ── 2. Stat row ───────────────────────────────────────────────────── */}
       <div className="grid grid-cols-4 gap-3 mb-5">
         <StatCard label="Active Alerts"     value="5"  sub="2 high severity"   color="#EF4444" />
         <StatCard label="Themes Tracked"    value="8"  sub="3 🔥 HOT momentum" color="#F97316" />
@@ -128,7 +82,7 @@ export default function DashboardPage() {
         <StatCard label="Avg Risk Score"    value="64" sub="↑ +8 vs yesterday" color="#2D7DD2" />
       </div>
 
-      {/* ── 4. Main grid ─────────────────────────────────────────────────── */}
+      {/* ── 3. Main grid ─────────────────────────────────────────────────── */}
       <div className="grid grid-cols-12 gap-4">
 
         {/* Alerts — left column */}
@@ -160,7 +114,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ── 5. Top signals (capped at 5, links to Briefing for more) ──────── */}
+      {/* ── 4. Top signals (capped at 5, links to Briefing for more) ──────── */}
       <div className="mt-4">
         <MacroDevelopments articles={topNews} showViewAll />
       </div>

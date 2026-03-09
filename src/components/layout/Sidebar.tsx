@@ -162,7 +162,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
             )}
           </div>
           <div className="text-[#4A5A6E] mt-0.5">
-            {isLive ? 'FRED · NewsAPI' : 'Rich mock data'}
+            FRED · NewsAPI
           </div>
         </div>
       </div>
