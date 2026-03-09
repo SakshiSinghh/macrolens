@@ -209,9 +209,9 @@ export default function InsightsPage() {
 
   return (
     <AppShell title="AI Insights" subtitle="Query macro intelligence grounded in platform data">
-      <div className="grid grid-cols-12 gap-4 h-[calc(100vh-220px)]">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:h-[calc(100vh-220px)]">
         {/* Suggestions sidebar — grouped by intent */}
-        <div className="col-span-3 space-y-3 overflow-y-auto">
+        <div className="md:col-span-3 space-y-3 overflow-y-auto">
           <div className="text-xs text-[#4A5A6E] uppercase tracking-wider">Ask MacroLens</div>
 
           {SUGGESTION_GROUPS.map(group => (
@@ -254,7 +254,7 @@ export default function InsightsPage() {
         </div>
 
         {/* Chat area */}
-        <div className="col-span-9 flex flex-col bg-[#0F1623] border border-[#1E2A3B] rounded-md overflow-hidden">
+        <div className="md:col-span-9 flex flex-col bg-[#0F1623] border border-[#1E2A3B] rounded-md overflow-hidden h-[65vh] md:h-auto">
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((msg, i) => (

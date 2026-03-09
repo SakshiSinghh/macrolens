@@ -96,6 +96,15 @@ html, body {
   animation: pulseGlow 3s ease-in-out infinite;
 }
 
+/* ─── Utility: hide scrollbar ─────────────────────────────────────────────── */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* ─── Light mode overrides ────────────────────────────────────────────────────
    Tailwind arbitrary-value classes like bg-[#0F1623] compile to CSS class
    .bg-\[\#0F1623\] — these can be targeted and overridden using CSS specificity.
