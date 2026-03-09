@@ -10,6 +10,33 @@ interface ThemeCardProps {
   theme: MacroTheme
 }
 
+// ─── Momentum urgency badge ────────────────────────────────────────────────────
+// HOT = score ≥ 80 (red)  |  RISING = 60–79 (amber)  |  COOLING = < 40 (blue)
+function MomentumBadge({ score }: { score: number }) {
+  if (score >= 80) {
+    return (
+      <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200">
+        🔥 HOT
+      </span>
+    )
+  }
+  if (score >= 60) {
+    return (
+      <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
+        ↑ RISING
+      </span>
+    )
+  }
+  if (score < 40) {
+    return (
+      <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-600 border border-blue-200">
+        ↓ COOLING
+      </span>
+    )
+  }
+  return null // 40–59: no badge, neutral
+}
+
 export function ThemeCard({ theme }: ThemeCardProps) {
   const trendColor = getTrendColor(theme.trendDirection)
 
@@ -18,12 +45,15 @@ export function ThemeCard({ theme }: ThemeCardProps) {
       <div className="bg-[#0F1623] border border-[#1E2A3B] rounded-md p-4 hover:border-[#2D7DD2]/40 hover:bg-[#111927] transition-colors cursor-pointer">
         {/* Header row */}
         <div className="flex items-start justify-between gap-2 mb-2">
-          <div>
-            <div className="flex items-center gap-2 mb-0.5">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
               <h3 className="text-sm font-semibold text-[#E8EDF5]">{theme.name}</h3>
-              {theme.badge && <TrendBadge badge={theme.badge} />}
+              <MomentumBadge score={theme.momentumScore} />
             </div>
-            <div className="text-xs text-[#4A5A6E]">Updated {timeAgo(theme.lastUpdated)}</div>
+            <div className="flex items-center gap-2 flex-wrap">
+              {theme.badge && <TrendBadge badge={theme.badge} />}
+              <div className="text-xs text-[#4A5A6E]">Updated {timeAgo(theme.lastUpdated)}</div>
+            </div>
           </div>
           <div className="text-right shrink-0">
             <div className="text-xl font-bold font-mono" style={{ color: trendColor }}>
