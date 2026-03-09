@@ -7,11 +7,24 @@ import { computeThemeMomentum } from '@/lib/scoring'
 import { fetchMacroNews } from '@/lib/newsapi'
 import type { MacroThemeKey } from '@/types'
 
+// Safety lock: when NEXT_PUBLIC_DEMO_MODE=true, all routes skip live calls
+const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+
 // GET /api/themes
 // Phase 3: fetches real news from NewsAPI and boosts/adjusts theme momentum
 // based on live article counts. Falls back to scored mock themes if NewsAPI unavailable.
 export async function GET() {
   try {
+    if (DEMO_MODE) {
+      const sorted = [...mockThemes].sort((a, b) => b.momentumScore - a.momentumScore)
+      return NextResponse.json({
+        themes: sorted,
+        generatedAt: new Date().toISOString(),
+        newsSource: 'demo',
+        liveArticleCounts: {},
+      })
+    }
+
     // Fetch news — returns mock sources if NEWS_API_KEY not configured
     const { articles, source: newsSource } = await fetchMacroNews(60)
 

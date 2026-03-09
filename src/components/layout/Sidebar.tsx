@@ -32,11 +32,21 @@ const navItems = [
 const DATA_SOURCE = process.env.NEXT_PUBLIC_DATA_SOURCE ?? 'DEMO'
 const isLive = DATA_SOURCE === 'LIVE'
 
-export function Sidebar() {
+interface SidebarProps {
+  mobileOpen?: boolean
+  onMobileClose?: () => void
+}
+
+export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname()
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-56 bg-[#080C14] border-r border-[#1E2A3B] flex flex-col z-40">
+    <aside className={cn(
+      'fixed left-0 top-0 h-screen w-56 bg-[#080C14] border-r border-[#1E2A3B] flex flex-col z-40',
+      'transition-transform duration-250',
+      // On mobile (<md): slide in/out. On desktop: always visible.
+      mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
+    )}>
       {/* Logo */}
       <div className="px-4 py-4 border-b border-[#1E2A3B]">
         <div className="flex items-center gap-2.5">

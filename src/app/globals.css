@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
+/* ─── Design token CSS variables (dark mode — default) ───────────────────────*/
 :root {
   --bg-page: #080C14;
   --bg-card: #0F1623;
@@ -47,3 +48,106 @@ html, body {
 .react-flow__background {
   background-color: #080C14 !important;
 }
+
+/* ─── Animation keyframes ─────────────────────────────────────────────────────*/
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,194,255,0); }
+  50%       { box-shadow: 0 0 14px 3px rgba(0,194,255,0.12); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s ease-out both;
+}
+.animate-slide-in-left {
+  animation: slideInLeft 0.28s ease-out both;
+}
+.animate-scale-in {
+  animation: scaleIn 0.22s ease-out both;
+}
+
+/* Staggered children — apply class to a list wrapper */
+.stagger-children > *:nth-child(1) { animation: fadeIn 0.35s ease-out 0ms   both; }
+.stagger-children > *:nth-child(2) { animation: fadeIn 0.35s ease-out 60ms  both; }
+.stagger-children > *:nth-child(3) { animation: fadeIn 0.35s ease-out 120ms both; }
+.stagger-children > *:nth-child(4) { animation: fadeIn 0.35s ease-out 180ms both; }
+.stagger-children > *:nth-child(5) { animation: fadeIn 0.35s ease-out 240ms both; }
+.stagger-children > *:nth-child(6) { animation: fadeIn 0.35s ease-out 300ms both; }
+.stagger-children > *:nth-child(7) { animation: fadeIn 0.35s ease-out 360ms both; }
+.stagger-children > *:nth-child(8) { animation: fadeIn 0.35s ease-out 420ms both; }
+
+/* Subtle pulse glow for high-severity alert cards */
+.alert-pulse {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+/* ─── Light mode overrides ────────────────────────────────────────────────────
+   Tailwind arbitrary-value classes like bg-[#0F1623] compile to CSS class
+   .bg-\[\#0F1623\] — these can be targeted and overridden using CSS specificity.
+   No component changes needed; just set data-theme="light" on <html>.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Base */
+html[data-theme="light"],
+html[data-theme="light"] body {
+  background-color: #EEF2F8;
+  color: #0F1623;
+}
+
+html[data-theme="light"] ::-webkit-scrollbar-track { background: #EEF2F8; }
+html[data-theme="light"] ::-webkit-scrollbar-thumb { background: #C9D4E0; }
+
+/* ── Backgrounds ──────────────────────────────────────────────────────────── */
+html[data-theme="light"] .bg-\[\#080C14\] { background-color: #EEF2F8 !important; }
+html[data-theme="light"] .bg-\[\#0F1623\] { background-color: #FFFFFF !important; }
+html[data-theme="light"] .bg-\[\#161D2E\] { background-color: #EDF1F8 !important; }
+
+/* Hover states */
+html[data-theme="light"] .hover\:bg-\[\#111927\]:hover { background-color: #E5EBF4 !important; }
+html[data-theme="light"] .hover\:bg-\[\#161D2E\]:hover { background-color: #E0E8F4 !important; }
+html[data-theme="light"] .hover\:bg-\[\#0F1623\]:hover { background-color: #F7F9FD !important; }
+
+/* Active nav item */
+html[data-theme="light"] .bg-\[\#00C2FF\]\/10 { background-color: rgba(0,194,255,0.12) !important; }
+
+/* Regime / alert semantic tints */
+html[data-theme="light"] .bg-\[\#1A0A0A\] { background-color: #FFF5F5 !important; }
+html[data-theme="light"] .bg-\[\#1A1200\] { background-color: #FFFBF0 !important; }
+html[data-theme="light"] .bg-\[\#0A1A12\] { background-color: #F0FFF7 !important; }
+html[data-theme="light"] .bg-\[\#1A0505\] { background-color: #FFF0F0 !important; }
+
+/* ── Borders ──────────────────────────────────────────────────────────────── */
+html[data-theme="light"] .border-\[\#1E2A3B\] { border-color: #C9D4E0 !important; }
+html[data-theme="light"] .border-t-\[\#1E2A3B\] { border-top-color: #C9D4E0 !important; }
+html[data-theme="light"] .border-b-\[\#1E2A3B\] { border-bottom-color: #C9D4E0 !important; }
+html[data-theme="light"] .border-r-\[\#1E2A3B\] { border-right-color: #C9D4E0 !important; }
+html[data-theme="light"] .border-l-\[\#1E2A3B\] { border-left-color: #C9D4E0 !important; }
+html[data-theme="light"] .divide-\[\#1E2A3B\] > :not([hidden]) ~ :not([hidden]) {
+  border-color: #C9D4E0 !important;
+}
+
+/* ── Text ─────────────────────────────────────────────────────────────────── */
+html[data-theme="light"] .text-\[\#E8EDF5\] { color: #0F1623 !important; }
+html[data-theme="light"] .text-\[\#7A8FA6\] { color: #3D5166 !important; }
+html[data-theme="light"] .text-\[\#4A5A6E\] { color: #6B7E8F !important; }
+
+/* ── Charts & graphs ──────────────────────────────────────────────────────── */
+html[data-theme="light"] .recharts-cartesian-grid-horizontal line,
+html[data-theme="light"] .recharts-cartesian-grid-vertical line { stroke: #C9D4E0; }
+html[data-theme="light"] .recharts-text tspan { fill: #3D5166; }
+html[data-theme="light"] .react-flow__background { background-color: #EEF2F8 !important; }

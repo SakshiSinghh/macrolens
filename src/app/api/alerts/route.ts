@@ -7,11 +7,24 @@ import { mockHeatmap } from '@/lib/mock/heatmap'
 import { generateAlerts, rankAlerts } from '@/lib/alert-engine'
 import { fetchMacroIndicators } from '@/lib/fred'
 
+// Safety lock: when NEXT_PUBLIC_DEMO_MODE=true, all routes skip live calls
+const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+
 // GET /api/alerts
 // Phase 3: uses live FRED indicators for the scoring pipeline when available.
 // Falls back to hardcoded indicators + mock alerts if FRED is unavailable.
 export async function GET() {
   try {
+    if (DEMO_MODE) {
+      const ranked = rankAlerts(mockAlerts)
+      return NextResponse.json({
+        alerts: ranked,
+        generatedAt: new Date().toISOString(),
+        totalCount: ranked.length,
+        indicatorSource: 'demo',
+      })
+    }
+
     // Fetch indicators — returns mock if FRED_API_KEY not set
     const indicators = await fetchMacroIndicators()
 

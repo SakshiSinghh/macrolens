@@ -17,11 +17,41 @@ const severityLeftBorder: Record<string, string> = {
   low:      'border-l-[#22C55E]',
 }
 
+/** Small SVG semicircle arc visualising confidence score. */
+function ConfidenceArc({ score }: { score: number }) {
+  const color =
+    score >= 80 ? '#22C55E' :
+    score >= 60 ? '#EAB308' :
+    score >= 40 ? '#F97316' : '#EF4444'
+
+  // Arc: M(2,11) → counterclockwise up → (22,11), radius 9
+  const r = 9
+  const totalLength = Math.PI * r   // ≈ 28.3
+  const dashLength  = (score / 100) * totalLength
+
+  return (
+    <div className="flex flex-col items-center gap-0" title={`Confidence: ${score}%`}>
+      <svg width="24" height="12" viewBox="0 0 24 12" aria-hidden="true">
+        {/* Track */}
+        <path d="M 2 11 A 9 9 0 0 0 22 11"
+          fill="none" stroke="#1E2A3B" strokeWidth="2" strokeLinecap="round" />
+        {/* Fill */}
+        <path d="M 2 11 A 9 9 0 0 0 22 11"
+          fill="none" stroke={color} strokeWidth="2" strokeLinecap="round"
+          strokeDasharray={`${dashLength} ${totalLength}`} />
+      </svg>
+      <span className="text-[10px] font-mono leading-none" style={{ color }}>{score}%</span>
+    </div>
+  )
+}
+
 export function AlertCard({ alert }: AlertCardProps) {
   const leftBorder = severityLeftBorder[alert.severity] ?? 'border-l-[#1E2A3B]'
+  const isHighSeverity = alert.severity === 'critical' || alert.severity === 'high'
+
   return (
     <Link href="/insights">
-      <div className={`bg-[#0F1623] border border-[#1E2A3B] border-l-2 ${leftBorder} rounded-md p-4 hover:border-[#2D7DD2]/40 hover:bg-[#111927] transition-colors cursor-pointer group`}>
+      <div className={`bg-[#0F1623] border border-[#1E2A3B] border-l-2 ${leftBorder} rounded-md p-4 hover:border-[#2D7DD2]/40 hover:bg-[#111927] transition-colors cursor-pointer group ${isHighSeverity ? 'alert-pulse' : ''}`}>
         {/* Header */}
         <div className="flex items-start justify-between gap-2 mb-2">
           <div className="flex items-center gap-2">
@@ -29,11 +59,13 @@ export function AlertCard({ alert }: AlertCardProps) {
             <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${getRiskBgClass(alert.severity)}`}>
               {riskLevelLabel(alert.severity)}
             </span>
-            <span className="text-xs font-mono text-[#4A5A6E]">{alert.confidenceScore}% conf.</span>
           </div>
-          <div className="flex items-center gap-1 text-xs text-[#4A5A6E]">
-            <span>{timeAgo(alert.triggeredAt)}</span>
-            <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="flex items-center gap-2">
+            <ConfidenceArc score={alert.confidenceScore} />
+            <div className="flex items-center gap-1 text-xs text-[#4A5A6E]">
+              <span>{timeAgo(alert.triggeredAt)}</span>
+              <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
           </div>
         </div>
 
@@ -56,7 +88,7 @@ export function AlertCard({ alert }: AlertCardProps) {
           ))}
         </div>
 
-        {/* Evidence count */}
+        {/* Evidence + watchpoints count */}
         <div className="mt-2 pt-2 border-t border-[#1E2A3B] flex items-center gap-3">
           <span className="text-xs text-[#4A5A6E]">
             {alert.supportingEvidence.length} evidence sources

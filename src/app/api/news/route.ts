@@ -2,7 +2,11 @@ export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
 import { fetchMacroNews } from '@/lib/newsapi'
+import { mockSources } from '@/lib/mock/sources'
 import type { MacroThemeKey } from '@/types'
+
+// Safety lock: when NEXT_PUBLIC_DEMO_MODE=true, all routes skip live calls
+const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
 
 // GET /api/news?theme=inflation&limit=20
 // Returns macro news articles, optionally filtered by theme.
@@ -12,6 +16,18 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const theme = searchParams.get('theme') as MacroThemeKey | null
     const limit = Math.min(parseInt(searchParams.get('limit') ?? '30', 10), 100)
+
+    if (DEMO_MODE) {
+      const filtered = theme
+        ? mockSources.filter((a) => a.themes.includes(theme))
+        : mockSources
+      return NextResponse.json({
+        articles: filtered.slice(0, limit),
+        totalCount: filtered.length,
+        source: 'demo',
+        fetchedAt: new Date().toISOString(),
+      })
+    }
 
     const { articles, source, fetchedAt } = await fetchMacroNews(Math.max(limit, 60))
 
