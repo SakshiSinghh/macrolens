@@ -5,12 +5,23 @@ import { classifyRegime } from '@/lib/scoring'
 import { fetchMacroIndicators, buildRegimeDrivers } from '@/lib/fred'
 import { mockRegime } from '@/lib/mock/regime'
 
+// Safety lock: when NEXT_PUBLIC_DEMO_MODE=true, all routes skip live calls
+const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+
 // GET /api/regime
 // Returns the current macro regime.
 // Phase 3: uses live FRED indicators when FRED_API_KEY is configured.
 // Falls back to mock data gracefully if the API is unavailable.
 export async function GET() {
   try {
+    if (DEMO_MODE) {
+      return NextResponse.json({
+        ...mockRegime,
+        dataSource: 'demo',
+        generatedAt: new Date().toISOString(),
+      })
+    }
+
     // Fetch indicators — returns mock data if FRED_API_KEY not set
     const indicators = await fetchMacroIndicators()
 
