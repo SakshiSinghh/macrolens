@@ -7,13 +7,51 @@ import { mockAlerts } from '@/lib/mock/alerts'
 
 interface Message { role: 'user' | 'assistant'; content: string; timestamp: Date }
 
-const SUGGESTIONS = [
-  'How does rising inflation affect tech stocks?',
-  'Why is US macro risk elevated right now?',
-  'What themes are spreading from Europe to emerging markets?',
-  'What would a China property collapse mean for commodities?',
-  'Compare current inflation to the 2022 episode',
+// ─── Grouped suggestion chips ────────────────────────────────────────────────
+// Organised by intent so users immediately understand what the AI can answer.
+const SUGGESTION_GROUPS = [
+  {
+    label: '🔥 URGENT',
+    color: '#DC2626',
+    bgColor: '#FFF1F2',
+    borderColor: '#FECACA',
+    items: [
+      'Why is US macro risk elevated right now?',
+      'What\'s driving the HOT inflation signal?',
+    ],
+  },
+  {
+    label: '🌍 CONTAGION',
+    color: '#D97706',
+    bgColor: '#FFFBEB',
+    borderColor: '#FDE68A',
+    items: [
+      'What themes are spreading from Europe to emerging markets?',
+      'What would a China property collapse mean for commodities?',
+    ],
+  },
+  {
+    label: '📈 MARKETS',
+    color: '#0284C7',
+    bgColor: '#F0F9FF',
+    borderColor: '#BAE6FD',
+    items: [
+      'How does rising inflation affect tech stocks?',
+    ],
+  },
+  {
+    label: '🕐 HISTORY',
+    color: '#7C3AED',
+    bgColor: '#F5F3FF',
+    borderColor: '#DDD6FE',
+    items: [
+      'Compare current inflation to the 2022 episode',
+    ],
+  },
 ]
+
+// Flat list for backward-compat with getMockResponse
+const SUGGESTIONS = SUGGESTION_GROUPS.flatMap(g => g.items)
 
 const MOCK_RESPONSES: Record<string, string> = {
   default: `**Current Regime:** Late-Cycle Tightening → shifting toward Stagflation Risk (72% confidence)
@@ -172,26 +210,45 @@ export default function InsightsPage() {
   return (
     <AppShell title="AI Insights" subtitle="Query macro intelligence grounded in platform data">
       <div className="grid grid-cols-12 gap-4 h-[calc(100vh-220px)]">
-        {/* Suggestions sidebar */}
-        <div className="col-span-3 space-y-2">
-          <div className="text-xs text-[#4A5A6E] uppercase tracking-wider mb-3">Suggested Queries</div>
-          {SUGGESTIONS.map(s => (
-            <button
-              key={s}
-              onClick={() => sendMessage(s)}
-              disabled={thinking}
-              className="w-full text-left text-xs text-[#7A8FA6] bg-[#0F1623] border border-[#1E2A3B] rounded-md px-3 py-2.5 hover:text-[#E8EDF5] hover:border-[#2D7DD2]/40 transition-colors disabled:opacity-50"
-            >
-              {s}
-            </button>
+        {/* Suggestions sidebar — grouped by intent */}
+        <div className="col-span-3 space-y-3 overflow-y-auto">
+          <div className="text-xs text-[#4A5A6E] uppercase tracking-wider">Ask MacroLens</div>
+
+          {SUGGESTION_GROUPS.map(group => (
+            <div key={group.label}>
+              {/* Category label */}
+              <div
+                className="text-[10px] font-bold px-2 py-1 rounded-full inline-flex items-center mb-1.5 border"
+                style={{ color: group.color, backgroundColor: group.bgColor, borderColor: group.borderColor }}
+              >
+                {group.label}
+              </div>
+              {/* Chips */}
+              <div className="space-y-1">
+                {group.items.map(s => (
+                  <button
+                    key={s}
+                    onClick={() => sendMessage(s)}
+                    disabled={thinking}
+                    className="w-full text-left text-xs text-[#7A8FA6] bg-[#0F1623] border border-[#1E2A3B] rounded-md px-3 py-2.5 hover:text-[#E8EDF5] hover:border-[#2D7DD2]/40 transition-colors disabled:opacity-50 leading-snug"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
           ))}
-          <div className="bg-[#0F1623] border border-[#1E2A3B] rounded-md p-3 mt-4">
-            <div className="text-xs text-[#4A5A6E] uppercase tracking-wider mb-2">Context</div>
+
+          {/* Grounding notice */}
+          <div className="bg-[#0F1623] border border-[#1E2A3B] rounded-md p-3 mt-2">
+            <div className="text-[10px] font-semibold text-[#00C2FF] uppercase tracking-wider mb-1.5">
+              Grounded in MacroLens Data
+            </div>
             <div className="space-y-1 text-xs text-[#7A8FA6]">
-              <div>• {mockThemes.length} active themes</div>
-              <div>• {mockAlerts.length} risk alerts</div>
-              <div>• 16 countries tracked</div>
-              <div>• 2 domino chains</div>
+              <div>• {mockThemes.length} active themes tracked</div>
+              <div>• {mockAlerts.length} live risk alerts</div>
+              <div>• 16 countries monitored</div>
+              <div>• 2 domino causal chains</div>
             </div>
           </div>
         </div>

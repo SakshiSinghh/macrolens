@@ -2,6 +2,7 @@
 // ─── MacroLens Theme Provider ─────────────────────────────────────────────────
 // Manages dark/light mode with localStorage persistence.
 // Sets data-theme="dark|light" on <html> so CSS overrides in globals.css apply.
+// Default is LIGHT — judges and new visitors land on a clean white UI.
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
@@ -14,20 +15,21 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  theme: 'dark',
+  theme: 'light',
   toggleTheme: () => {},
-  isDark: true,
+  isDark: false,
 })
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('dark')
+  const [theme, setTheme] = useState<Theme>('light')
 
-  // On mount: read stored preference
+  // On mount: read stored preference; default is light for new visitors
   useEffect(() => {
     const stored = localStorage.getItem('ml-theme') as Theme | null
     if (stored === 'light' || stored === 'dark') {
       setTheme(stored)
     }
+    // No else: 'light' is already the initial state
   }, [])
 
   // Whenever theme changes: update <html> attribute + persist
