@@ -12,6 +12,7 @@ import {
   FileText,
   Bookmark,
   Activity,
+  BookOpen,
 } from 'lucide-react'
 
 // ─── Workflow navigation ───────────────────────────────────────────────────────
@@ -140,6 +141,29 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
           </div>
         ))}
       </nav>
+
+      {/* Guide link */}
+      <div className="px-2 pb-2 border-t border-[#1E2A3B] pt-2">
+        <Link
+          href="/guide"
+          onClick={onMobileClose}
+          className={cn(
+            'flex items-center gap-3 px-3 py-2 rounded text-sm transition-colors group relative',
+            pathname === '/guide'
+              ? 'bg-[#00C2FF]/10 text-[#00C2FF]'
+              : 'text-[#7A8FA6] hover:text-[#E8EDF5] hover:bg-[#161D2E]',
+          )}
+        >
+          {pathname === '/guide' && (
+            <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-[#00C2FF] rounded-r" />
+          )}
+          <BookOpen className={cn(
+            'w-4 h-4 shrink-0',
+            pathname === '/guide' ? 'text-[#00C2FF]' : 'text-[#4A5A6E] group-hover:text-[#7A8FA6]',
+          )} />
+          <span>User Guide</span>
+        </Link>
+      </div>
 
       {/* Footer — data source badge */}
       <div className="px-4 py-3 border-t border-[#1E2A3B]">

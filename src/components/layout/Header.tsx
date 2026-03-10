@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
-import { Bell, RefreshCw, Clock, Sun, Moon, Menu, X } from 'lucide-react'
+import { Bell, RefreshCw, Clock, Sun, Moon, Menu, X, HelpCircle } from 'lucide-react'
 import { useTheme } from '@/components/theme/ThemeProvider'
 import { mockAlerts } from '@/lib/mock/alerts'
 
@@ -8,11 +8,13 @@ interface HeaderProps {
   title: string
   subtitle?: string
   onMenuClick?: () => void
+  onHelpClick?: () => void
+  hasHelp?: boolean
 }
 
 const HIGH_ALERTS = mockAlerts.filter(a => a.severity === 'high').slice(0, 4)
 
-export function Header({ title, subtitle, onMenuClick }: HeaderProps) {
+export function Header({ title, subtitle, onMenuClick, onHelpClick, hasHelp }: HeaderProps) {
   const [timeStr, setTimeStr]     = useState('')
   const [notifOpen, setNotifOpen] = useState(false)
   const notifRef                  = useRef<HTMLDivElement>(null)
@@ -59,6 +61,18 @@ export function Header({ title, subtitle, onMenuClick }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-3">
+        {/* Help button */}
+        {hasHelp && onHelpClick && (
+          <button
+            onClick={onHelpClick}
+            title="Page help"
+            className="flex items-center gap-1.5 text-xs text-[#7A8FA6] hover:text-[#00C2FF] transition-colors px-2 py-1 rounded border border-[#1E2A3B] hover:border-[#00C2FF]/40"
+          >
+            <HelpCircle className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">How to use</span>
+          </button>
+        )}
+
         {/* Clock */}
         <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#4A5A6E] font-mono">
           <Clock className="w-3 h-3" />
